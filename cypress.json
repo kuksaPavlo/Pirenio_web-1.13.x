@@ -1,4 +1,4 @@
 {
     "baseurl" : "http://192.168.2.1",
-    "ignoreTestFiles" : "**/examples/*"
+    "ignoreTestFiles" : ["**/integration/1-getting-started/*", "**/integration/2-advanced-examples/*"]
 }
