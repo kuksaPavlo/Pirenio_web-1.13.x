@@ -3,67 +3,145 @@ import {loginToTheRouter} from "../support/pages/authenticatorProccess"
 import {url} from "../support/pages/url"
 
 
-it('Visit the login page', () => {
+it('', () => {
     url.urlToTheLoginPage('192.168.2.1');
     cy.wait(3000)
-})
-
-it('login', () => {
     loginToTheRouter.typeLoginCredentials('root', 'A25kxaEc')
-})
-
-it('WI-FI CLIENT MODE QS check the element', () => {
     cy.get('button[data-interface="wifi"]')
     .eq(0)
     .should('have.text', 'Wi-Fi Client Mode')
-})
-it('3G/4G CONNECTION QS check the element', () => {
-    cy.get('button[data-interface="lte"]')
+    .get('button[data-interface="lte"]')
     .should('have.text', '3G/4G connection')
-})
-it('ACCESS POINT MODE QS check the element', () => {
-    cy.get('button[data-interface="wifi"]')
+    .get('button[data-interface="wifi"]')
     .eq(1)
     .should('have.text', 'Access Point Mode')
-})
-it('ROUTER MODE QS check the element', () => {
-    cy.get('button[data-interface="wan"]')
+    .get('button[data-interface="wan"]')
     .should('have.text', 'Router Mode')
 })
-it('can modify the window prior to page load on all pages', () => {
-    // create the stub here
-    const ga = cy.stub().as('ga')
-  
-    // prevent google analytics from loading
-    // and replace it with a stub before every
-    // single page load including all new page
-    // navigations
-    cy.on('window:before:load', (win) => {
-      Object.defineProperty(win, 'ga', {
-        configurable: false,
-        get: () => ga, // always return the stub
-        set: () => {}, // don't allow actual google analytics to overwrite this property
-      })
-    })
-  
-    cy
-      // window:before:load will be called here
-      .visit('http://192.168.2.1/cgi-bin/luci/admin/quicksetup')
-  
-      .then((win) => {
-        // and here
-        win.location.href = 'http://192.168.2.1/cgi-bin/luci/admin/quicksetup/wan'
-      })
-  
-      // and here
-      .get('button[data-setting="dynamic-ip"]')
-      .click()
-  })
+
 it('ROUTER MODE QS check the element', () => {
+    url.urlToTheLoginPage('http://192.168.2.1/cgi-bin/luci/admin/quicksetup/wan');
+    loginToTheRouter.typeLoginCredentials('root', 'A25kxaEc')
     cy.get('button[data-interface="wan"]')
     .should('be.visible')
     .click();
+    cy.get('button[data-setting="dynamic-ip"]')
+    .should('have.text', 'Dynamic IP')
+    .get('button[data-setting="static-ip"]')
+    .should('have.text', 'Static IP')
+    cy.get('button[data-setting="ppoe"]')
+    .should('have.text', ' PPPoE ')
+    cy.get('button[data-setting="pptp"]')
+    .should('have.text', ' PPTP ')
+    cy.get('button[data-setting="l2tp"]')
+    .should('have.text', ' L2TP ')
+
 })
+it.only('', () => {
+    url.urlToTheLoginPage('http://192.168.2.1/cgi-bin/luci/admin/quicksetup/wan');
+    loginToTheRouter.typeLoginCredentials('root', 'A25kxaEc')
+    cy.get('button[data-interface="wan"]')
+    .should('be.visible')
+    .click();
+    cy.get('button[data-setting="dynamic-ip"]')
+    .should('be.visible')
+    .click();
+    cy.wait(17000)
+    .get('#ipaddr')
+    .should('contain.text', '192.168.')
+    .get('#dns1')
+    .should('contain.text', '192.168.')
+    .get('#dns2')
+    .should('contain.text', '')
+    .get('#gateway')
+    .should('contain.text', '192.168.')
+    .get('#prev')
+    .should('be.visible')
+    .get('#next')
+    .should('be.visible')
+    .click()
+//wi-fi section
+    .wait(5000)
+    cy.get('#mode-header')
+    .should('have.text', 'Dual Band Wi-Fi Access Point\n')//check the text "Dual Band Wi-Fi Access Point"
+    .get('#basic-switch')
+    .should('have.value', 'Standart')//check the DB tougle value
+    .get('[data-wifi-iface="default_radio0"]')//check visibility 2.4GHz section
+    .should('be.visible')
+    .get('[data-wifi-iface="default_radio1"]')//check visibility 5.0GHz section
+    .should('be.visible')
+    .get('#basic-switch')//switch-on the DB tougle 
+    .check()
+    .get('#basic-switch')//check the DB tougle value
+    .should('have.value', 'Dual')
+    .get('[data-wifi-iface="default_radio0"]')//check visibility 2.4GHz section
+    .should('be.visible')
+    .get('[data-wifi-iface="default_radio1"]')//check NOT visibility 5.0GHz section
+    .should('not.be.visible')
+    .get('#quick-setup').find('div').find('h3')
+    .should('have.text', 'If enabled, both 2.4 GHz and 5.0 GHz bands will be united in a single Wi-Fi Access Point')//check the text
+    .get('[class=wifi-mode]')
+    .should('contain.text', 'Dual Band Access Point')//check the text
+    .get('#prev') //prev button visibility
+    .should('be.visible')
+    .get('#next')//next button visibility
+    .should('be.visible')
+    .get('#basic-switch')//switch-off DB tougle 
+    .click()
+
+    .get('[class=wifi-mode]').eq(0)//check the 2.4 GHz band visibility
+    .should('have.text', '2.4 GHz')
+    .get('[class=wifi-mode]').eq(1)//check the 5.0 GHz band visibility
+    .should('have.text', '5 GHz')
+
+    .get('[data-wifi-field="ssid"]').eq(0)//check the SSID 2.4
+    .should('contain.value', 'Perenio-2.4G-')
+    .get('[data-wifi-field="ssid"]').eq(1)//check the SSID 2.4
+    .should('contain.value', 'Perenio-5G-')
+
+    // .get('[class="mdc-select__selected-text"]').eq(0)//LENGUAGE
+    // .click({force: true})
+    // .get('[aria-expanded]')
+    // .should('have.value', 'true')
+
+    .get('[class="mdc-select__selected-text"]').eq(1)//check the WPA Ecryption drop-down list for 2.4GHz
+    .click()
+    .get('.mdc-menu-surface--open').find('ul > li')
+    .should(($lis) => {
+        expect($lis).to.have.length(4)
+        expect($lis.eq(0)).to.contain('NONE')
+        expect($lis.eq(1)).to.contain('WPA-PSK')
+        expect($lis.eq(2)).to.contain('WPA-PSK 2')
+        expect($lis.eq(3)).to.contain('WPA-PSK/WPA-PSK 2 MIXED MODE')
+
+    })
+    .get('[class="mdc-select__selected-text"]').eq(3)//check the WPA Ecryption drop-down list for 5.0GHz
+    .click()
+    .get('.mdc-menu-surface--open').find('ul > li')
+    .should(($lis) => {
+        expect($lis).to.have.length(4)
+        expect($lis.eq(0)).to.contain('NONE')
+        expect($lis.eq(1)).to.contain('WPA-PSK')
+        expect($lis.eq(2)).to.contain('WPA-PSK 2')
+        expect($lis.eq(3)).to.contain('WPA-PSK/WPA-PSK 2 MIXED MODE')
+
+    })
+    .get('[class="mdc-select__selected-text"]').eq(2)//check the WPA Ecryption drop-down list for 2.4GHz
+    .click()
+    .get('.mdc-menu-surface--open').find('ul > li')
+    .should(($lis) => {
+        expect($lis).to.have.length(4)
+        expect($lis.eq(0)).to.contain('AUTO')
+        expect($lis.eq(1)).to.contain('Force CCMP (AES)')
+        expect($lis.eq(2)).to.contain('Force TKIP')
+        expect($lis.eq(3)).to.contain('Force TKIP and CCMP (AES)')
+
+    })
+
+})
+
+    
+
 
 
 
