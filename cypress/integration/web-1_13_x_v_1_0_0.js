@@ -2,6 +2,8 @@
 import {loginToTheRouter} from "../support/pages/authenticatorProccess"
 import {url} from "../support/pages/url"
 import {chekingFooterUrls} from "../support/pages/footerUrls"
+import {checkingQsFiFiPassword} from "../support/pages/checkingQsWiFiPassword"
+import {wiFiAuthenticationMethodList} from "../support/pages/checkingWiFiAutheneticatioMethodDropDownList"
 
 it('', () => {
     url.urlToTheLoginPage('192.168.2.1');
@@ -126,56 +128,11 @@ it.only('', () => {
         expect($lis.eq(3)).to.contain('WPA-PSK/WPA-PSK 2 MIXED MODE')
 
     })
-    .get('[class="mdc-select__selected-text"]').eq(2)//check the Autheneticatio Method drop-down list for 5.0GHz
-    .click()
-    .get('.mdc-menu-surface--open').find('ul > li')
-    .should(($lis) => {
-        expect($lis).to.have.length(4)
-        expect($lis.eq(0)).to.contain('AUTO')
-        expect($lis.eq(1)).to.contain('Force CCMP (AES)')
-        expect($lis.eq(2)).to.contain('Force TKIP')
-        expect($lis.eq(3)).to.contain('Force TKIP and CCMP (AES)')
-
-    })
-    .get('[class="mdc-select__selected-text"]').eq(4)//check the Autheneticatio Method drop-down list for 2.4GHz
-    .click()
-    .get('.mdc-menu-surface--open').find('ul > li')
-    .should(($lis) => {
-        expect($lis).to.have.length(4)
-        expect($lis.eq(0)).to.contain('AUTO')
-        expect($lis.eq(1)).to.contain('Force CCMP (AES)')
-        expect($lis.eq(2)).to.contain('Force TKIP')
-        expect($lis.eq(3)).to.contain('Force TKIP and CCMP (AES)')
-
-    })
-
-    .get('.key ').eq(2).find('div').find('i')//check the password and visibility for 5.0GHz
-    .should('have.text', 'visibility')
-    .click()
-    .should('have.text', 'visibility_off')
-    .get('.key ').eq(2).find('div').find('input')
-    .should('have.value', 'b8ehys4f')
-
-    .get('.key ').eq(1).find('div').find('i')//check the password and visibility for 5.0GHz
-    .should('have.text', 'visibility')
-    .click()
-    .should('have.text', 'visibility_off')
-    .get('.key ').eq(1).find('div').find('input')
-    .should('have.value', 'b8ehys4f')
+   
+    wiFiAuthenticationMethodList.checkingWifiAuthMet()
+    checkingQsFiFiPassword.checkingWiFiPassword('b8ehys4f')
     chekingFooterUrls.urlsChecking()
-    // .get('.app-link').eq(0).find('a')//cheking the href url on the footer
-    // .should('be.visible')
-    // .invoke('attr', 'href')
-    // .should('eq', 'https://apps.apple.com/ru/app/perenio-smart/id1373712777')
-    // .get('.app-link').eq(1).find('a')
-    // .should('be.visible')
-    // .invoke('attr', 'href')
-    // .should('eq', 'https://play.google.com/store/apps/details?id=com.perenio.smarthome')
-    // .get('.grid').find('div').find('a')
-    // .should('be.visible')
-    // .invoke('attr', 'href')
-    // .should('eq', 'http://perenio.com')
-
+    
 
     cy.get('#next')//next button visibility
     .click()
