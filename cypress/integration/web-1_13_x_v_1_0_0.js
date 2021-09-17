@@ -128,7 +128,7 @@ it.only('', () => {
         expect($lis.eq(3)).to.contain('WPA-PSK/WPA-PSK 2 MIXED MODE')
 
     })
-   
+    
     wiFiAuthenticationMethodList.checkingWifiAuthMet()
     checkingQsFiFiPassword.checkingWiFiPassword('b8ehys4f')
     chekingFooterUrls.urlsChecking()
