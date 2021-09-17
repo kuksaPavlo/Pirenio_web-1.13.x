@@ -4,6 +4,7 @@ import {url} from "../support/pages/url"
 import {chekingFooterUrls} from "../support/pages/footerUrls"
 import {checkingQsFiFiPassword} from "../support/pages/checkingQsWiFiPassword"
 import {wiFiAuthenticationMethodList} from "../support/pages/checkingWiFiAutheneticatioMethodDropDownList"
+import {checkTheFiFiWPAEncryption} from "../support/pages/checkTheWiFiWPAEncryption"
 
 it('', () => {
     url.urlToTheLoginPage('192.168.2.1');
@@ -101,39 +102,11 @@ it.only('', () => {
     .get('[data-wifi-field="ssid"]').eq(1)//check the SSID 2.4
     .should('contain.value', 'Perenio-5G-')
 
-    // .get('[class="mdc-select__selected-text"]').eq(0)//LENGUAGE
-    // .click({force: true})
-    // .get('[aria-expanded]')
-    // .should('have.value', 'true')
-
-    .get('[class="mdc-select__selected-text"]').eq(1)//check the WPA Ecryption drop-down list for 2.4GHz
-    .click()
-    .get('.mdc-menu-surface--open').find('ul > li')
-    .should(($lis) => {
-        expect($lis).to.have.length(4)
-        expect($lis.eq(0)).to.contain('NONE')
-        expect($lis.eq(1)).to.contain('WPA-PSK')
-        expect($lis.eq(2)).to.contain('WPA-PSK 2')
-        expect($lis.eq(3)).to.contain('WPA-PSK/WPA-PSK 2 MIXED MODE')
-
-    })
-    .get('[class="mdc-select__selected-text"]').eq(3)//check the WPA Ecryption drop-down list for 5.0GHz
-    .click()
-    .get('.mdc-menu-surface--open').find('ul > li')
-    .should(($lis) => {
-        expect($lis).to.have.length(4)
-        expect($lis.eq(0)).to.contain('NONE')
-        expect($lis.eq(1)).to.contain('WPA-PSK')
-        expect($lis.eq(2)).to.contain('WPA-PSK 2')
-        expect($lis.eq(3)).to.contain('WPA-PSK/WPA-PSK 2 MIXED MODE')
-
-    })
-    
+    checkTheFiFiWPAEncryption.checkingWPAEncryption()
     wiFiAuthenticationMethodList.checkingWifiAuthMet()
     checkingQsFiFiPassword.checkingWiFiPassword('b8ehys4f')
     chekingFooterUrls.urlsChecking()
     
-
     cy.get('#next')//next button visibility
     .click()
 
@@ -144,21 +117,6 @@ it.only('', () => {
 
 
 
-// it('request', () => {
-
-// const requestBody = {method: "getSimStatus"}
-
-
-//     cy.request({
-//         method: 'POST',
-//         url: 'http://192.168.2.1/cgi-bin/luci/admin/api/v1/modem',
-//         body: requestBody,
-//         headers: '',
-//     })
-//         .then((response)=>{
-//             console.log(response);
-//         })
-// })
 
 
 
@@ -177,6 +135,11 @@ it.only('', () => {
 
 
 
+
+    // .get('[class="mdc-select__selected-text"]').eq(0)//LENGUAGE
+    // .click({force: true})
+    // .get('[aria-expanded]')
+    // .should('have.value', 'true')
 
 //******************QS ROUTER MODE*********************** */
 
