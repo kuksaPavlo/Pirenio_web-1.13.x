@@ -1,11 +1,12 @@
 ///<reference types="Cypress" />
+
 import {loginToTheRouter} from "../support/pages/authenticatorProccess"
 import {url} from "../support/pages/url"
 import {chekingFooterUrls} from "../support/pages/footerUrls"
 import {checkingQsFiFiPassword} from "../support/pages/checkingQsWiFiPassword"
 import {wiFiAuthenticationMethodList} from "../support/pages/checkingWiFiAutheneticatioMethodDropDownList"
 import {checkTheFiFiWPAEncryption} from "../support/pages/checkTheWiFiWPAEncryption"
-import { get } from "cypress/types/lodash"
+
 
 const WIFIPASSWORD = 'b8ehys4f'
 const LOGINPASSWORD = 'A25kxaEc'
@@ -62,7 +63,7 @@ it('ROUTER MODE QS check the element', () => {
     chekingFooterUrls.urlsChecking()//footer url checking (AppStore, GooglePlay, Perenio.com)
 });
 
-it.only('DYNAMIC IP test', () => {
+it('DYNAMIC IP test', () => {
     url.urlToTheLoginPage('http://192.168.2.1/cgi-bin/luci/admin/quicksetup/wan');
     loginToTheRouter.typeLoginCredentials(USERNAME, LOGINPASSWORD)
     cy.get('button[data-interface="wan"]')//transfer to the Router mode
@@ -82,7 +83,7 @@ it.only('DYNAMIC IP test', () => {
     .get('#gateway')
     .should('contain.text', '192.168.')
     chekingFooterUrls.urlsChecking()//footer url checking (AppStore, GooglePlay, Perenio.com)
-    .get('#prev')
+    cy.get('#prev')
     .should('be.visible')
     .get('#next')
     .should('be.visible')
@@ -162,6 +163,7 @@ it.only('DYNAMIC IP test', () => {
     .get('#cancel-disconnect')
     .should('be.visible')
     .click()
+    .wait(4000)
     .get('#skip-iot')
     .should('be.visible')
     .click()
@@ -177,64 +179,4 @@ it.only('DYNAMIC IP test', () => {
     
     cy.location('pathname', { timeout: 40000 }).should('eq', '/cgi-bin/luci/');
 
-
-    //reset the router
-    cy.visit('http://192.168.2.1/cgi-bin/luci/admin/system/flashops', {timeout: 3000})
-    .get('#perform-reset')
-    .click()
-    cy.get('button[#confirm-dialog]')
-    .click()
-
 });
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // .get('[class="mdc-select__selected-text"]').eq(0)//LENGUAGE
-    // .click({force: true})
-    // .get('[aria-expanded]')
-    // .should('have.value', 'true')
-
-//******************QS ROUTER MODE*********************** */
-
-Cypress.on('uncaught:exception', (err, runnable) => {
-    // returning false here prevents Cypress from
-    // failing the test
-    return false
-  })
-// it('redirect to the ROURE MODE qs page', () => {
-//     cy.visit('http://192.168.2.1/cgi-bin/luci/admin/quicksetup/wan');
-       
-// })
-// it('Check the Router Mode element exists', () => {
-//     cy.wait(4000)
-//     .get('button[data-setting="dynamic-ip"]')
-//     .get('button[data-setting="static-ip"]')
-//     .get('button[data-setting="ppoe"]')
-//     .get('button[data-setting="pptp"]')
-//     .get('button[data-setting="l2tp"]')
-//     .get('button[onclick="window.history.back();"]')
-// })
-
-//******************Dashboard**************** */
