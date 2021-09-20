@@ -5,51 +5,74 @@ import {chekingFooterUrls} from "../support/pages/footerUrls"
 import {checkingQsFiFiPassword} from "../support/pages/checkingQsWiFiPassword"
 import {wiFiAuthenticationMethodList} from "../support/pages/checkingWiFiAutheneticatioMethodDropDownList"
 import {checkTheFiFiWPAEncryption} from "../support/pages/checkTheWiFiWPAEncryption"
+import { get } from "cypress/types/lodash"
 
-it('', () => {
-    url.urlToTheLoginPage('192.168.2.1');
+const WIFIPASSWORD = 'b8ehys4f'
+const LOGINPASSWORD = 'A25kxaEc'
+const USERNAME = 'root'
+const ROUTERURL = '192.168.2.1'
+
+it('CHECK THE QS ELEMENT', () => {
+    url.urlToTheLoginPage(ROUTERURL); //transfer to the router GUI
     cy.wait(3000)
-    loginToTheRouter.typeLoginCredentials('root', 'A25kxaEc')
-    cy.get('button[data-interface="wifi"]')
+    loginToTheRouter.typeLoginCredentials(USERNAME, LOGINPASSWORD) //Login proccess
+    //checcking the QS elements
+    cy.get('button[data-interface="wifi"]', {wait:10000})
     .eq(0)
     .should('have.text', 'Wi-Fi Client Mode')
+    .should('be.visible')
     .get('button[data-interface="lte"]')
     .should('have.text', '3G/4G connection')
+    .should('be.visible')
     .get('button[data-interface="wifi"]')
     .eq(1)
     .should('have.text', 'Access Point Mode')
+    .should('be.visible')
     .get('button[data-interface="wan"]')
     .should('have.text', 'Router Mode')
-})
+    .should('be.visible')
+    .get('#skip-qs-wrapper')
+    .should('have.text', '\n   \n      Skip the quick setup\n   \n')
+    .should('be.visible')
+    chekingFooterUrls.urlsChecking() //footer url checking (AppStore, GooglePlay, Perenio.com)
+});
 
 it('ROUTER MODE QS check the element', () => {
     url.urlToTheLoginPage('http://192.168.2.1/cgi-bin/luci/admin/quicksetup/wan');
-    loginToTheRouter.typeLoginCredentials('root', 'A25kxaEc')
-    cy.get('button[data-interface="wan"]')
+    loginToTheRouter.typeLoginCredentials(USERNAME, LOGINPASSWORD)
+    cy.get('button[data-interface="wan"]') //transfer to the Router Mode
     .should('be.visible')
     .click();
+    //Checking the ROUTER MODE elements
     cy.get('button[data-setting="dynamic-ip"]')
     .should('have.text', 'Dynamic IP')
+    .should('be.visible')
     .get('button[data-setting="static-ip"]')
     .should('have.text', 'Static IP')
-    cy.get('button[data-setting="ppoe"]')
+    .should('be.visible')
+    .get('button[data-setting="ppoe"]')
     .should('have.text', ' PPPoE ')
-    cy.get('button[data-setting="pptp"]')
+    .should('be.visible')
+    .get('button[data-setting="pptp"]')
     .should('have.text', ' PPTP ')
-    cy.get('button[data-setting="l2tp"]')
+    .should('be.visible')
+    .get('button[data-setting="l2tp"]')
     .should('have.text', ' L2TP ')
+    .should('be.visible')
+    chekingFooterUrls.urlsChecking()//footer url checking (AppStore, GooglePlay, Perenio.com)
+});
 
-})
-it.only('', () => {
+it.only('DYNAMIC IP test', () => {
     url.urlToTheLoginPage('http://192.168.2.1/cgi-bin/luci/admin/quicksetup/wan');
-    loginToTheRouter.typeLoginCredentials('root', 'A25kxaEc')
-    cy.get('button[data-interface="wan"]')
+    loginToTheRouter.typeLoginCredentials(USERNAME, LOGINPASSWORD)
+    cy.get('button[data-interface="wan"]')//transfer to the Router mode
     .should('be.visible')
     .click();
-    cy.get('button[data-setting="dynamic-ip"]')
+    cy.get('button[data-setting="dynamic-ip"]')//transfer to the Dynamic-ip mode
     .should('be.visible')
     .click();
     cy.wait(17000)
+    //checking DHCP conf information
     .get('#ipaddr')
     .should('contain.text', '192.168.')
     .get('#dns1')
@@ -58,6 +81,7 @@ it.only('', () => {
     .should('contain.text', '')
     .get('#gateway')
     .should('contain.text', '192.168.')
+    chekingFooterUrls.urlsChecking()//footer url checking (AppStore, GooglePlay, Perenio.com)
     .get('#prev')
     .should('be.visible')
     .get('#next')
@@ -104,13 +128,64 @@ it.only('', () => {
 
     checkTheFiFiWPAEncryption.checkingWPAEncryption()
     wiFiAuthenticationMethodList.checkingWifiAuthMet()
-    checkingQsFiFiPassword.checkingWiFiPassword('b8ehys4f')
+    cy.get('.mdc-menu-surface--open').find('ul > li').eq(3)
+    .should('contain.text', 'Force TKIP and CCMP (AES)')
+    .click()
+    checkingQsFiFiPassword.checkingWiFiPassword(WIFIPASSWORD)
     chekingFooterUrls.urlsChecking()
     
     cy.get('#next')//next button visibility
     .click()
 
-})
+    chekingFooterUrls.urlsChecking()
+    cy.get('[data-perenio-field="email"]')
+    .click()
+    .type(USERNAME, {wait:2000})
+    .get('[data-perenio-field="password"]')
+    .click()
+    .type(LOGINPASSWORD)
+    .get('#login')
+    .should('be.visible')
+    .click()
+    .get('[tabindex="2"]')
+    .should('contain.text', 'Sign Up')
+    .should('be.visible')
+    .get('#skip-iot')
+    .should('be.visible')
+    .click()
+
+    cy.get('[data-translate="Wi_Fi_settings_could_be_changed"]')
+    .should('have.text', 'If you have changed your Wi-Fi settings, you might need to connect to the Wi-Fi network again using your new credentials.')
+    .should('be.visible')
+    .get('#send-disconnect')
+    .should('be.visible')
+    .get('#cancel-disconnect')
+    .should('be.visible')
+    .click()
+    .get('#skip-iot')
+    .should('be.visible')
+    .click()
+
+    cy.get('[data-translate="Wi_Fi_settings_could_be_changed"]')
+    .should('have.text', 'If you have changed your Wi-Fi settings, you might need to connect to the Wi-Fi network again using your new credentials.')
+    .should('be.visible')
+    .get('#cancel-disconnect')
+    .should('be.visible')
+    .get('#send-disconnect')
+    .should('be.visible')
+    .click()
+    
+    cy.location('pathname', { timeout: 40000 }).should('eq', '/cgi-bin/luci/');
+
+
+    //reset the router
+    cy.visit('http://192.168.2.1/cgi-bin/luci/admin/system/flashops', {timeout: 3000})
+    .get('#perform-reset')
+    .click()
+    cy.get('button[#confirm-dialog]')
+    .click()
+
+});
 
     
 
