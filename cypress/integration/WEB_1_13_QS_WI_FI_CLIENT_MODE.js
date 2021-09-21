@@ -3,9 +3,7 @@
 import {loginToTheRouter} from "../support/pages/authenticatorProccess"
 import {url} from "../support/pages/url"
 import {chekingFooterUrls} from "../support/pages/footerUrls"
-import {checkingQsFiFiPassword} from "../support/pages/checkingQsWiFiPassword"
-import {wiFiAuthenticationMethodList} from "../support/pages/checkingWiFiAutheneticatioMethodDropDownList"
-import {checkTheFiFiWPAEncryption} from "../support/pages/checkTheWiFiWPAEncryption"
+
 
 
 const WIFIPASSWORD = 'b8ehys4f'
@@ -38,13 +36,13 @@ it('CHECK THE QS ELEMENT', () => {
     chekingFooterUrls.urlsChecking() //footer url checking (AppStore, GooglePlay, Perenio.com)
 });
 
-it('ROUTER MODE QS check the element', () => {
-    url.urlToTheLoginPage('http://192.168.2.1/cgi-bin/luci/admin/quicksetup/wifi/client');
-    loginToTheRouter.typeLoginCredentials(USERNAME, LOGINPASSWORD)    
-    chekingFooterUrls.urlsChecking()//footer url checking (AppStore, GooglePlay, Perenio.com)
-});
+// it('ROUTER MODE QS check the element', () => {
+//     url.urlToTheLoginPage('http://192.168.2.1/cgi-bin/luci/admin/quicksetup/wifi/client');
+//     loginToTheRouter.typeLoginCredentials(USERNAME, LOGINPASSWORD)    
+//     chekingFooterUrls.urlsChecking()//footer url checking (AppStore, GooglePlay, Perenio.com)
+// });
 
-it('statick IP test', () => {
+it('WI-Fi CLient Mode test', () => {
     url.urlToTheLoginPage('http://192.168.2.1/cgi-bin/luci/admin/quicksetup/wifi/client');
     loginToTheRouter.typeLoginCredentials(USERNAME, LOGINPASSWORD)
     cy.get('#wifi-client-link')
@@ -63,24 +61,18 @@ it('statick IP test', () => {
     .get('#next')
     .should('be.visible')
     .click()
+    cy.wait(60000)
 
 
-    .get('.mdc-dialog__content')
-    .should('have.text', '\n                    Wireless configuration not found. Please perform a factory reset if the\n                    problem persists - reinstall the firmware.\n                \n\n                    Describe the problem:\n\n                    \n\n                        0 / 3000\n\n                        \n                        \n                        \n                            \n                            \n                        \n\n                    \n\n                    Please specify the approximate time when the issue happened\n\n                    \n\n                        \n\n                            \n\n                            \n\n                                \n\n                                \n                                    Date\n                                \n\n                                \n\n                            \n                        \n\n                        \n\n                            \n\n                            \n\n                                \n\n                                \n                                    Time\n                                \n\n                                \n\n                            \n\n                        \n\n                    \n\n\n                Attention! You are currently connected to "Perenio-2.4G-ACKv" Access Point of the IoT Router. It will be disabled after setting up the Wi-Fi Client Mode. Please connect your device to another Access Point of the IoT Router in order to have access to the admin panel and the Internet from your device.')
-    .get('#confirm-dialog')
-    .click()
-
-    
 //wi-fi section
-    // .wait(5000)
     // cy.get('#mode-header')
     // .should('have.text', 'Dual Band Wi-Fi Access Point\n')//check the text "Dual Band Wi-Fi Access Point"
     // .get('#basic-switch')
     // .should('have.value', 'Standart')//check the DB tougle value
     // .get('[data-wifi-iface="default_radio0"]')//check visibility 2.4GHz section
     // .should('be.visible')
-    // .get('[data-wifi-iface="default_radio1"]')//check visibility 5.0GHz section
-    // .should('be.visible')
+    cy.get('[data-wifi-iface="default_radio1"]')//check visibility 5.0GHz section
+    .should('be.visible')
     // .get('#basic-switch')//switch-on the DB tougle 
     // .check()
     // .get('#basic-switch')//check the DB tougle value
@@ -102,66 +94,100 @@ it('statick IP test', () => {
 
     // .get('[class=wifi-mode]').eq(0)//check the 2.4 GHz band visibility
     // .should('have.text', '2.4 GHz')
-    // .get('[class=wifi-mode]').eq(1)//check the 5.0 GHz band visibility
-    // .should('have.text', '5 GHz')
+    .get('[class=wifi-mode]').eq(1)//check the 5.0 GHz band visibility
+    .should('have.text', '5 GHz')
 
     // .get('[data-wifi-field="ssid"]').eq(0)//check the SSID 2.4
     // .should('contain.value', 'Perenio-2.4G-')
-    // .get('[data-wifi-field="ssid"]').eq(1)//check the SSID 2.4
-    // .should('contain.value', 'Perenio-5G-')
+    .get('[data-wifi-field="ssid"]').eq(1)//check the SSID 5.0
+    .should('contain.value', 'Perenio-5G-')
 
-    // checkTheFiFiWPAEncryption.checkingWPAEncryption()
-    // wiFiAuthenticationMethodList.checkingWifiAuthMet()
-    // cy.get('.mdc-menu-surface--open').find('ul > li').eq(3)
-    // .should('contain.text', 'Force TKIP and CCMP (AES)')
-    // .click()
-    // checkingQsFiFiPassword.checkingWiFiPassword(WIFIPASSWORD)
-    // chekingFooterUrls.urlsChecking()
+    .get('[class="mdc-select__selected-text"]').eq(3)//check the WPA Ecryption drop-down list for 5.0GHz
+    .click()
+    .get('.mdc-menu-surface--open').find('ul > li')
+    .should(($lis) => {
+        expect($lis).to.have.length(4)
+        expect($lis.eq(0)).to.contain('NONE')
+        expect($lis.eq(1)).to.contain('WPA-PSK')
+        expect($lis.eq(2)).to.contain('WPA-PSK 2')
+        expect($lis.eq(3)).to.contain('WPA-PSK/WPA-PSK 2 MIXED MODE')
+        
+    })
+    cy.get('.mdc-menu-surface--open').find('ul > li').eq(3)
+    .should('contain.text', 'WPA-PSK/WPA-PSK 2 MIXED MODE')
+    .click()
+
+
+    cy.get('[class="mdc-select__selected-text"]').eq(4)//check the Autheneticatio Method drop-down list for 5.0GHz
+    .wait(2000)
+    .click()
+    .get('.mdc-menu-surface--open').find('ul > li')
+    .should(($lis) => {
+        expect($lis).to.have.length(4)
+        expect($lis.eq(0)).to.contain('AUTO')
+        expect($lis.eq(1)).to.contain('Force CCMP (AES)')
+        expect($lis.eq(2)).to.contain('Force TKIP')
+        expect($lis.eq(3)).to.contain('Force TKIP and CCMP (AES)')
+
+    })
+    cy.get('.mdc-menu-surface--open').find('ul > li').eq(3)
+    .should('contain.text', 'Force TKIP and CCMP (AES)')
+    .click()
+
+    cy.get('.key ').eq(2).find('div').find('i')//check the password and visibility for 5.0GHz
+    .should('have.text', 'visibility')
+    .click()
+    .should('have.text', 'visibility_off')
+    .get('.key ').eq(2).find('div').find('input')
+    .should('have.value', WIFIPASSWORD) 
     
-    // cy.get('#next')//next button visibility
-    // .click()
-
-    // chekingFooterUrls.urlsChecking()
-    // cy.get('[data-perenio-field="email"]')
-    // .click()
-    // .type(USERNAME, {wait:2000})
-    // .get('[data-perenio-field="password"]')
-    // .click()
-    // .type(LOGINPASSWORD)
-    // .wait(4000)
-    // .get('#login')
-    // .should('be.visible')
-    // .click()
-    // .wait(4000)
-    // .get('[tabindex="2"]')
-    // .should('contain.text', 'Sign Up')
-    // .should('be.visible')
-    // .get('#skip-iot')
-    // .should('be.visible')
-    // .click()
-
-    // cy.get('[data-translate="Wi_Fi_settings_could_be_changed"]')
-    // .should('have.text', 'If you have changed your Wi-Fi settings, you might need to connect to the Wi-Fi network again using your new credentials.')
-    // .should('be.visible')
-    // .get('#send-disconnect')
-    // .should('be.visible')
-    // .get('#cancel-disconnect')
-    // .should('be.visible')
-    // .click()
-    // .wait(4000)
-    // .get('#skip-iot')
-    // .should('be.visible')
-    // .click()
-
-    // cy.get('[data-translate="Wi_Fi_settings_could_be_changed"]')
-    // .should('have.text', 'If you have changed your Wi-Fi settings, you might need to connect to the Wi-Fi network again using your new credentials.')
-    // .should('be.visible')
-    // .get('#cancel-disconnect')
-    // .should('be.visible')
-    // .get('#send-disconnect')
-    // .should('be.visible')
-    // .click()
+    chekingFooterUrls.urlsChecking()
     
-    // cy.location('pathname', { timeout: 40000 }).should('eq', '/cgi-bin/luci/');
+    cy.get('#next')//next button visibility
+    .click()
+
+    chekingFooterUrls.urlsChecking()
+    cy.get('[data-perenio-field="email"]')
+    .click()
+    .type(USERNAME, {wait:2000})
+    .get('[data-perenio-field="password"]')
+    .wait(5000)
+    .click()
+    .type(LOGINPASSWORD)
+    .wait(4000)
+    .get('#login')
+    .should('be.visible')
+    .click()
+    .wait(4000)
+    .get('[tabindex="2"]')
+    .should('contain.text', 'Sign Up')
+    .should('be.visible')
+    .get('#skip-iot')
+    .should('be.visible')
+    .click()
+
+    cy.get('[data-translate="Wi_Fi_settings_could_be_changed"]')
+    .should('have.text', 'If you have changed your Wi-Fi settings, you might need to connect to the Wi-Fi network again using your new credentials.')
+    .should('be.visible')
+    .get('#send-disconnect')
+    .should('be.visible')
+    .get('#cancel-disconnect')
+    .should('be.visible')
+    .click()
+    .wait(4000)
+    .get('#skip-iot')
+    .should('be.visible')
+    .click()
+
+    cy.get('[data-translate="Wi_Fi_settings_could_be_changed"]')
+    .should('have.text', 'If you have changed your Wi-Fi settings, you might need to connect to the Wi-Fi network again using your new credentials.')
+    .should('be.visible')
+    .get('#cancel-disconnect')
+    .should('be.visible')
+    .get('#send-disconnect')
+    .should('be.visible')
+    .click()
+    
+    cy.location('pathname', { timeout: 40000 }).should('eq', '/cgi-bin/luci/');
 
 });
